@@ -51,7 +51,7 @@
         現時点で考えられる<strong>原因をできるだけ多く</strong>書き出してください。<br>
         箇条書きで構いません。
       </p>
-      <textarea placeholder="例：来店客数が減っている／単価が下がっている など"></textarea>
+      <textarea id="q1" placeholder="例：来店客数が減っている／単価が下がっている など"></textarea>
     </div>
 
     <hr>
@@ -65,7 +65,7 @@
       <p>
         「なぜそれが重要だと思うか」を言葉で説明してください。
       </p>
-      <textarea placeholder="なぜそれが売上低下の主要因だと考えましたか？"></textarea>
+      <textarea id="q2" placeholder="なぜそれが売上低下の主要因だと考えましたか？"></textarea>
     </div>
 
     <hr>
@@ -79,11 +79,17 @@
       <p>
         理由とあわせて書いてください。
       </p>
-      <textarea placeholder="例：POSデータを分析する／顧客層の変化を調べる 等"></textarea>
+      <textarea id="q3" placeholder="例：POSデータを分析する／顧客層の変化を調べる 等"></textarea>
     </div>
 
     <hr>
 
+    <div class="card">
+  <h2>回答を保存する</h2>
+  <p class="muted">評価・採用判断には使用されません。</p>
+  <button class="btn" onclick="submitAnswers()">保存する</button>
+</div>
+    
     <div class="card">
       <h2>完了</h2>
       <p>
@@ -98,5 +104,45 @@
     </div>
 
   </div>
+  <script type="module">
+  import { createClient } from 'https://supabase.com/dashboard/project/lgcjvkagdftvkunybctx/editor/17547?schema=public;
+
+  const supabaseUrl = 'SUPABASE_URL';
+  const supabaseKey = 'ANON_KEY';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  window.submitAnswers = async () => {
+    const q1 = document.getElementById('q1').value.trim();
+    const q2 = document.getElementById('q2').value.trim();
+    const q3 = document.getElementById('q3').value.trim();
+
+    if (!q1 || !q2 || !q3) {
+      alert('すべての設問に回答してください');
+      return;
+    }
+
+    const answerText =
+`【課題① 状況整理】
+${q1}
+
+【課題② 仮説】
+${q2}
+
+【課題③ 次のアクション】
+${q3}`;
+
+    const { error } = await supabase.from('submissions').insert({
+      challenge_id: 'consulting_day1',
+      answer_text: answerText
+    });
+
+    if (error) {
+      alert('保存エラー: ' + error.message);
+    } else {
+      alert('保存しました。お疲れさまでした。');
+    }
+  };
+</script>
+
 </body>
 </html>
